@@ -1,4 +1,4 @@
-FROM golang:1.18-bullseye
+FROM golang:1.23-bullseye
 
 RUN go install github.com/hansmi/prometheus-lvm-exporter@latest
 
