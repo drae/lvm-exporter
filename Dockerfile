@@ -9,4 +9,4 @@ ENV GO111MODULE=on
 ENV GOFLAGS=-mod=vendor
 
 EXPOSE 9845
-CMD ["prometheus-lvm-exporter", "--command /sbin/lvm"]
+CMD ["prometheus-lvm-exporter", "--command=/sbin/lvm"]
