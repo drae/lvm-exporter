@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - "Dockerfile"
     tags:
       - "v*"
 
@@ -29,6 +31,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Extract LVM Exporter version
+        id: lvm-version
+        run: |
+          VERSION=$(grep -o 'prometheus-lvm-exporter@v[0-9.]*' Dockerfile | cut -d'@' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Found LVM Exporter version: $VERSION"
+
       # Uses the `docker/login-action` action to log in to the Container registry registry using the account and password that will publish the packages. Once published, the packages are scoped to the account defined here.
       - name: Log in to the Container registry
         uses: docker/login-action@3227f5311cb93ffd14d13e65d8cc400d30f4dd8a
@@ -42,6 +52,13 @@ jobs:
         uses: docker/metadata-action@a60f0f62b5c12316066c8db464bfb2faafd7907b
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ steps.lvm-version.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see "[Usage](https://github.com/docker/build-push-action#usage)" in the README of the `docker/build-push-action` repository.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
