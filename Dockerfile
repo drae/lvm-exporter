@@ -1,4 +1,4 @@
-FROM golang:1.23-bullseye
+FROM golang:1.24-bullseye
 
 RUN apt-get update || exit 0
 RUN apt-get install -y lvm2
